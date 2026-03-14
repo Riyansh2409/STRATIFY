@@ -1,0 +1,21 @@
+OrderID,Date,Product,Category,Price,Quantity,CustomerAge,City,PaymentMethod,Discount
+1001,2025-01-01,Laptop,Electronics,75000,1,28,Bangalore,Card,10
+1002,2025-01-02,Headphones,Electronics,2500,2,32,Delhi,UPI,
+1003,2025-01-03,Coffee Maker,Home Appliances,3500,1,45,Mumbai,Cash,5
+1004,2025-01-04,Office Chair,Furniture,8000,1,,Chennai,Card,15
+1005,2025-01-05,Notebook,Stationery,120,5,21,Hyderabad,UPI,
+1006,2025-01-06,Tablet,Electronics,30000,1,35,Pune,Card,8
+1007,2025-01-07,Pen Pack,Stationery,200,3,,Delhi,Cash,
+1008,2025-01-08,Monitor,Electronics,15000,1,29,Bangalore,Card,12
+1009,2025-01-09,Water Bottle,Home Appliances,500,2,40,Mumbai,UPI,
+1010,2025-01-10,Desk Lamp,Furniture,1200,2,27,Chennai,Card,5
+1011,2025-01-11,Keyboard,Electronics,1800,1,,Hyderabad,UPI,
+1012,2025-01-12,Mouse,Electronics,900,2,31,Pune,Card,3
+1013,2025-01-13,Printer,Electronics,12000,1,38,Bangalore,Card,
+1014,2025-01-14,Notebook,Stationery,120,10,22,Delhi,Cash,2
+1015,2025-01-15,Microwave,Home Appliances,8500,1,,Mumbai,UPI,10
+1016,2025-01-16,Bookshelf,Furniture,6000,1,36,Chennai,Card,7
+1017,2025-01-17,Tablet,Electronics,30000,1,33,Hyderabad,Card,
+1018,2025-01-18,Pen Pack,Stationery,200,4,,Pune,Cash,
+1019,2025-01-19,Monitor,Electronics,15000,1,41,Bangalore,UPI,6
+1020,2025-01-20,Water Bottle,Home Appliances,500,3,30,Delhi,Card,

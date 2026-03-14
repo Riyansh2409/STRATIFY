@@ -1,42 +1,24 @@
 {
   "chunk_stats": {
-    "total_chunks": 126,
-    "mean_token_count": 59.92,
+    "total_chunks": 10,
+    "mean_token_count": 60.0,
     "median_token_count": 60.0,
-    "std_token_count": 0.89,
-    "mean_quality_score": 0.8089,
+    "std_token_count": 0.0,
+    "mean_quality_score": 0.8299,
     "language_distribution": {
-      "en": 119,
-      "ca": 4,
-      "nl": 2,
-      "af": 1
+      "en": 10
     },
-    "domain_distribution": {
-      "finance": 1
-    },
+    "domain_distribution": {},
     "file_type_distribution": {
-      "csv": 126
+      "csv": 10
     }
   },
-  "test_results": [
-    {
-      "test": "Chi-Square Goodness-of-Fit",
-      "statistic": 324.222222,
-      "p_value": 0.0,
-      "degrees_of_freedom": 3,
-      "effect_size": 1.603,
-      "verdict": "SIGNIFICANT \u2713",
-      "alpha": 0.05,
-      "notes": "Categories: en, ca, nl, af. N=126"
-    }
-  ],
+  "test_results": [],
   "chart_paths": {
     "fig_1_1": "reports_output\\figures\\fig_1_1_token_distribution.png",
     "fig_1_2": "reports_output\\figures\\fig_1_2_language_distribution.png",
     "fig_1_3": "reports_output\\figures\\fig_1_3_quality_scores.png",
-    "fig_2_2": "reports_output\\figures\\fig_2_2_pvalue_summary.png",
-    "fig_3_1": "reports_output\\figures\\fig_3_1_metric_comparison.png",
-    "fig_3_3": "reports_output\\figures\\fig_3_3_domain_distribution.png"
+    "fig_3_1": "reports_output\\figures\\fig_3_1_metric_comparison.png"
   },
   "metric_table": {
     "Base Llama-3 8B": {

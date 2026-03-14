@@ -1,16 +1,13 @@
 {
   "total_files": 1,
-  "total_raw_chars": 14797,
-  "chunks_before_filter": 126,
-  "chunks_after_filter": 126,
-  "filter_rate_pct": 0.0,
-  "dropped_too_short": 0,
+  "total_raw_chars": 1378,
+  "chunks_before_filter": 11,
+  "chunks_after_filter": 10,
+  "filter_rate_pct": 9.09,
+  "dropped_too_short": 1,
   "dropped_low_quality": 0,
   "dropped_duplicates": 0,
   "language_distribution": {
-    "en": 119,
-    "ca": 4,
-    "nl": 2,
-    "af": 1
+    "en": 10
   }
 }
