@@ -152,7 +152,7 @@ if test_results:
 
 chart_paths = analysis_report.get("chart_paths", {})
 if chart_paths:
-    st.markdown("**Data Distributions**")
+    st.markdown("**NLP Pipeline Data Distributions**")
     cols = st.columns(2)
     col_idx = 0
     for fig_id, path_str in chart_paths.items():
@@ -163,11 +163,37 @@ if chart_paths:
                 st.image(image, caption=fig_id, use_container_width=True)
             col_idx += 1
 
-    st.markdown("---")
-    
-    # ── AI Statistical Assistant ──
-    st.subheader("🧠 AI Statistical Assistant")
-    st.markdown("Let the AI analyze your dataset properties and recommend the best statistical tests.")
+# ── Business Analysis Charts ──────────────────────────────────────────────────
+st.markdown("---")
+st.subheader("📈 Business Analysis")
+st.markdown("Auto-generated **business intelligence charts** from your uploaded CSV / Excel files.")
+
+from analysis.business_charts import generate_business_charts
+
+with st.spinner("Generating business charts from your data..."):
+    try:
+        biz_charts = generate_business_charts(str(UPLOAD_DIR), str(REPORT_DIR / "figures"))
+        
+        if biz_charts:
+            biz_cols = st.columns(2)
+            b_idx = 0
+            for chart_label, chart_path in biz_charts.items():
+                chart_img_path = Path(chart_path)
+                if chart_img_path.exists():
+                    with biz_cols[b_idx % 2]:
+                        image = Image.open(chart_img_path)
+                        st.image(image, caption=chart_label, use_container_width=True)
+                    b_idx += 1
+        else:
+            st.info("ℹ️ No CSV or Excel files were found in your uploads. Upload structured data files to see business charts (KPI summary, trends, category breakdowns, market share, correlations).")
+    except Exception as e:
+        st.warning(f"Business chart generation encountered an issue: {e}")
+
+st.markdown("---")
+
+# ── AI Statistical Assistant ──
+st.subheader("🧠 AI Statistical Assistant")
+st.markdown("Let the AI analyze your dataset properties and recommend the best statistical tests.")
     
     # Attempt to load RAG components globally for UI use
     rag_available = False
