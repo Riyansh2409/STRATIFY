@@ -140,18 +140,27 @@ def get_status():
     charts = {}
     figure_dir = REPORT_DIR / "figures"
     if figure_dir.exists():
-        # Regenerate business charts info
-        try:
-            biz_charts = generate_business_charts(str(UPLOAD_DIR), str(figure_dir))
-            for label, path in biz_charts.items():
-                charts[label] = Path(path).name
-        except: pass
+        # 1. Grab all .png files as potential insights
+        for f in figure_dir.glob("*.png"):
+            # Skip temp or system files if any
+            if "export" in f.name: continue
+            
+            # Clean label for UI
+            label = f.name.replace("fig_", "").replace(".png", "").replace("_", " ").title()
+            charts[label] = f.name
+            
+        print(f"✓ Discovered {len(charts)} charts in {figure_dir}")
 
     return {
         "status": "ready",
         "stats": stats,
         "charts": charts
     }
+
+@app.get("/download-report")
+def download_report_get(chi: bool = True, ttest: bool = False, anova: bool = False):
+    """Wrapper for export-pdf to support simple GET triggers from UI with options."""
+    return export_pdf(ExportRequest(use_chi=chi, use_ttest=ttest, use_anova=anova))
 
 @app.get("/charts/{filename}")
 def get_chart_image(filename: str):

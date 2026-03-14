@@ -1,10 +1,10 @@
 {
   "chunk_stats": {
     "total_chunks": 1,
-    "mean_token_count": 294.0,
-    "median_token_count": 294.0,
+    "mean_token_count": 71.0,
+    "median_token_count": 71.0,
     "std_token_count": 0.0,
-    "mean_quality_score": 0.7305,
+    "mean_quality_score": 0.8459,
     "language_distribution": {
       "en": 1
     },

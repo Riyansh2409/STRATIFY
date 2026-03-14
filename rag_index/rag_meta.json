@@ -1,9 +1,9 @@
 {
   "backend": "chroma",
   "chunk_count": 15,
-  "index_dir": "c:\\Users\\Jainish pachori\\JAINISH_STRATIFY\\STRATIFY\\rag_index",
+  "index_dir": "C:\\Users\\Jainish pachori\\JAINISH_STRATIFY\\STRATIFY\\rag_index",
   "top_k": 5,
   "use_reranker": false,
   "use_mmr": true,
-  "data_source": "c:\\Users\\Jainish pachori\\JAINISH_STRATIFY\\STRATIFY\\processed_data\\val.jsonl"
+  "data_source": "C:\\Users\\Jainish pachori\\JAINISH_STRATIFY\\STRATIFY\\processed_data\\val.jsonl"
 }
