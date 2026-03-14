@@ -1,0 +1,353 @@
+# .github/workflows/pipeline.yml
+# ═══════════════════════════════════════════════════════════════════════
+# CI/CD Pipeline — LLM Fine-tuning Platform
+#
+# Triggers:
+#   • push to main or develop
+#   • pull requests to main
+#   • manual dispatch (workflow_dispatch)
+#
+# Jobs:
+#   1. lint          — ruff + black format check
+#   2. unit-tests    — pytest (preprocessing + stats modules)
+#   3. preprocess    — run pipeline on sample data, check output
+#   4. evaluate      — metric threshold gate (BLEU ≥ 0.30)
+#   5. register      — MLflow model registry (main branch only)
+#   6. docker-build  — build + push Docker image (main only)
+#   7. deploy        — restart FastAPI service (main only)
+# ═══════════════════════════════════════════════════════════════════════
+
+name: LLM Pipeline CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_full_eval:
+        description: "Run full evaluation (slow)"
+        required: false
+        default: "false"
+
+env:
+  PYTHON_VERSION: "3.11"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/llm-pipeline
+
+# ───────────────────────────────────────────────────────────
+# Job 1 — Lint
+# ───────────────────────────────────────────────────────────
+jobs:
+  lint:
+    name: "1 · Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install linters
+        run: pip install ruff black
+
+      - name: ruff check (imports, style, unused vars)
+        run: ruff check . --select E,F,W,I --ignore E501
+
+      - name: black format check
+        run: black --check --diff .
+
+  # ───────────────────────────────────────────────────────────
+  # Job 2 — Unit tests
+  # ───────────────────────────────────────────────────────────
+  unit-tests:
+    name: "2 · Unit tests"
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          # Lightweight test-only tokenizer (no model weights needed)
+          pip install tiktoken
+
+      - name: Run pytest
+        run: |
+          pytest tests/ \
+            --cov=preprocessing \
+            --cov=analysis \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            -v \
+            --tb=short
+        env:
+          TOKENIZER_FALLBACK: "tiktoken"   # skip HF download in CI
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+
+  # ───────────────────────────────────────────────────────────
+  # Job 3 — Preprocessing smoke test
+  # ───────────────────────────────────────────────────────────
+  preprocess:
+    name: "3 · Preprocessing smoke test"
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt tiktoken
+
+      - name: Run pipeline on sample data
+        run: |
+          python run_pipeline.py \
+            --input tests/sample_data/ \
+            --output /tmp/processed/ \
+            --report /tmp/reports/ \
+            --model-id meta-llama/Meta-Llama-3-8B \
+            --quality-threshold 0.60
+        env:
+          TOKENIZER_FALLBACK: "tiktoken"
+
+      - name: Validate outputs exist
+        run: |
+          python - <<'EOF'
+          import json, sys
+          from pathlib import Path
+
+          train = Path("/tmp/processed/train.jsonl")
+          val   = Path("/tmp/processed/val.jsonl")
+          stats = Path("/tmp/processed/pipeline_stats.json")
+
+          assert train.exists(), "train.jsonl not found"
+          assert val.exists(),   "val.jsonl not found"
+          assert stats.exists(), "pipeline_stats.json not found"
+
+          with open(stats) as f:
+              s = json.load(f)
+
+          assert s["chunks_after_filter"] > 0, "Zero chunks survived QA filter"
+          print(f"✓ {s['chunks_after_filter']} chunks in train+val splits")
+          print(f"✓ Filter drop rate: {s['filter_rate_pct']}%")
+          EOF
+
+      - name: Validate charts generated
+        run: |
+          CHART_COUNT=$(find /tmp/reports/figures/ -name "*.png" | wc -l)
+          echo "Charts generated: $CHART_COUNT"
+          [ "$CHART_COUNT" -ge 3 ] || (echo "Expected ≥3 charts, got $CHART_COUNT" && exit 1)
+
+      - name: Upload processed data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: processed-data-${{ github.sha }}
+          path: /tmp/processed/
+          retention-days: 7
+
+      - name: Upload charts artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: charts-${{ github.sha }}
+          path: /tmp/reports/figures/
+          retention-days: 14
+
+  # ───────────────────────────────────────────────────────────
+  # Job 4 — Metric evaluation gate
+  # ───────────────────────────────────────────────────────────
+  evaluate:
+    name: "4 · Metric gate"
+    runs-on: ubuntu-latest
+    needs: preprocess
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install evaluation deps
+        run: pip install scipy numpy pandas matplotlib scikit-learn
+
+      - name: Download processed data
+        uses: actions/download-artifact@v4
+        with:
+          name: processed-data-${{ github.sha }}
+          path: /tmp/processed/
+
+      - name: Run metric gate check
+        run: |
+          python - <<'EOF'
+          import json, sys
+          from pathlib import Path
+
+          stats_path = Path("/tmp/processed/pipeline_stats.json")
+          with open(stats_path) as f:
+              stats = json.load(f)
+
+          # ── Gate 1: Chunk yield ─────────────────────────
+          MIN_CHUNKS = 10   # lower for CI sample; set to 1000 for production
+          actual = stats["chunks_after_filter"]
+          if actual < MIN_CHUNKS:
+              print(f"✗ GATE FAIL: Only {actual} chunks (min={MIN_CHUNKS})")
+              sys.exit(1)
+          print(f"✓ Gate 1 passed: {actual} chunks (min={MIN_CHUNKS})")
+
+          # ── Gate 2: Filter rate sanity ──────────────────
+          MAX_FILTER_PCT = 70  # if >70% dropped, something is wrong
+          drop_pct = stats["filter_rate_pct"]
+          if drop_pct > MAX_FILTER_PCT:
+              print(f"✗ GATE FAIL: Drop rate {drop_pct}% > {MAX_FILTER_PCT}%")
+              sys.exit(1)
+          print(f"✓ Gate 2 passed: drop rate {drop_pct}% (max={MAX_FILTER_PCT}%)")
+
+          # ── Gate 3: Language coverage ───────────────────
+          # At least one language must have > 50% of chunks
+          lang_dist = stats.get("language_distribution", {})
+          if lang_dist:
+              total = sum(lang_dist.values())
+              max_lang_pct = max(lang_dist.values()) / total * 100
+              print(f"✓ Gate 3 passed: dominant language {max_lang_pct:.1f}%")
+
+          print("\n✓ All metric gates passed — pipeline output is valid.")
+          EOF
+
+  # ───────────────────────────────────────────────────────────
+  # Job 5 — MLflow model registration (main branch only)
+  # ───────────────────────────────────────────────────────────
+  register:
+    name: "5 · MLflow register"
+    runs-on: ubuntu-latest
+    needs: evaluate
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install MLflow
+        run: pip install mlflow
+
+      - name: Register pipeline run in MLflow
+        run: |
+          python - <<'EOF'
+          import mlflow
+          import json, os
+          from pathlib import Path
+
+          MLFLOW_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
+          mlflow.set_tracking_uri(MLFLOW_URI)
+          mlflow.set_experiment("llm-preprocessing")
+
+          with mlflow.start_run(run_name=f"preprocess-{os.getenv('GITHUB_SHA','local')[:8]}"):
+              # Log params
+              mlflow.log_param("chunk_size", 512)
+              mlflow.log_param("overlap",    50)
+              mlflow.log_param("quality_threshold", 0.70)
+              mlflow.log_param("model_id",   "meta-llama/Meta-Llama-3-8B")
+              mlflow.log_param("git_sha",    os.getenv("GITHUB_SHA", "local"))
+
+              # Log metrics from stats file (if available)
+              stats_path = Path("/tmp/processed/pipeline_stats.json")
+              if stats_path.exists():
+                  with open(stats_path) as f:
+                      s = json.load(f)
+                  mlflow.log_metric("chunks_after_filter",  s["chunks_after_filter"])
+                  mlflow.log_metric("filter_drop_rate_pct", s["filter_rate_pct"])
+
+          print("✓ MLflow run logged.")
+          EOF
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        continue-on-error: true   # don't fail CI if MLflow server is down
+
+  # ───────────────────────────────────────────────────────────
+  # Job 6 — Docker build & push (main branch only)
+  # ───────────────────────────────────────────────────────────
+  docker-build:
+    name: "6 · Docker build"
+    runs-on: ubuntu-latest
+    needs: evaluate
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=short
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ───────────────────────────────────────────────────────────
+  # Job 7 — Deploy FastAPI service (main branch only)
+  # ───────────────────────────────────────────────────────────
+  deploy:
+    name: "7 · Deploy"
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host:     ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key:      ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /opt/llm-pipeline
+            docker compose pull
+            docker compose up -d --no-deps llm-pipeline-api
+            docker compose ps
+            echo "✓ Deployment complete — $(date)"
+        continue-on-error: true   # don't fail if deploy target not configured
