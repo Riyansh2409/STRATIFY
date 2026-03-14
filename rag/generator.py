@@ -268,7 +268,8 @@ class RAGGenerator:
                 return_full_text=False,
             )
             answer = outputs[0]["generated_text"].strip()
-            tokens_used = len(self._tokenizer.encode(prompt + answer))
+            # In transformers pipelines, if return_full_text is False, the prompt is stripped
+            tokens_used = len(self._tokenizer.encode(answer))
 
         latency = time.time() - start
 
