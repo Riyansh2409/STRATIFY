@@ -72,10 +72,10 @@ def train_val_split(chunks, val_ratio: float, seed: int):
 
 def print_summary_table(stats, report):
     """Pretty-print pipeline + analysis summary to console."""
-    sep = "─" * 60
-    print(f"\n{'═'*60}")
+    sep = "-" * 60
+    print(f"\n{'='*60}")
     print("  PIPELINE SUMMARY")
-    print('═'*60)
+    print('='*60)
     print(f"  Files processed        : {stats.total_files}")
     print(f"  Total characters       : {stats.total_raw_chars:,}")
     print(f"  Chunks (before filter) : {stats.total_chunks_before_filter}")
@@ -92,20 +92,20 @@ def print_summary_table(stats, report):
     for lang, count in sorted(stats.language_distribution.items(),
                                key=lambda x: -x[1])[:8]:
         pct = 100 * count / max(stats.total_chunks_after_filter, 1)
-        bar = "█" * int(pct / 2)
+        bar = "#" * int(pct / 2)
         print(f"  {lang:<8} {count:>6}  {bar} {pct:.1f}%")
     print(sep)
     print("  STATISTICAL TESTS")
     print(sep)
     for t in report.test_results:
-        status = "✓ SIGNIFICANT" if t.p_value < t.alpha else "○ not significant"
+        status = "(SIGNIFICANT)" if t.p_value < t.alpha else "(not significant)"
         print(f"  {t.test_name[:38]:<38}  p={t.p_value:.4f}  {status}")
     print(sep)
     print("  CHARTS SAVED")
     print(sep)
     for fig_id, path in report.chart_paths.items():
-        print(f"  {fig_id:<10} → {path}")
-    print('═'*60 + "\n")
+        print(f"  {fig_id:<10} -> {path}")
+    print('='*60 + "\n")
 
 
 # ──────────────────────────────────────────────────────────

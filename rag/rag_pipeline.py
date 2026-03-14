@@ -50,11 +50,12 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / "preprocessing"))
 
-from embeddings import EmbeddingEngine, EmbeddingConfig
-from vector_store import build_vector_store
-from reranker import CrossEncoderReranker
-from retriever import RAGRetriever, RetrieverConfig
-from generator import RAGGenerator, GeneratorConfig
+from .embeddings import EmbeddingEngine, EmbeddingConfig
+from .vector_store import build_vector_store
+from .reranker import CrossEncoderReranker
+from .retriever import RAGRetriever, RetrieverConfig
+from .generator import RAGGenerator, GeneratorConfig
+
 
 
 # ─────────────────────────────────────────────────────────────

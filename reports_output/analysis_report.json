@@ -1,45 +1,32 @@
 {
   "chunk_stats": {
-    "total_chunks": 258931,
-    "mean_token_count": 60.0,
+    "total_chunks": 126,
+    "mean_token_count": 59.92,
     "median_token_count": 60.0,
-    "std_token_count": 0.0,
-    "mean_quality_score": 0.8102,
+    "std_token_count": 0.89,
+    "mean_quality_score": 0.8089,
     "language_distribution": {
-      "en": 218400,
-      "id": 36345,
-      "nl": 2268,
-      "ca": 890,
-      "af": 553,
-      "et": 103,
-      "sw": 95,
-      "de": 154,
-      "no": 15,
-      "tl": 60,
-      "ro": 6,
-      "so": 10,
-      "es": 5,
-      "it": 26,
-      "hr": 1
+      "en": 119,
+      "ca": 4,
+      "nl": 3
     },
     "domain_distribution": {
-      "finance": 1,
-      "technology": 107
+      "finance": 1
     },
     "file_type_distribution": {
-      "csv": 258931
+      "csv": 126
     }
   },
   "test_results": [
     {
       "test": "Chi-Square Goodness-of-Fit",
-      "statistic": 2581158.18038,
+      "statistic": 211.761905,
       "p_value": 0.0,
-      "degrees_of_freedom": 14,
-      "effect_size": 3.1573,
+      "degrees_of_freedom": 2,
+      "effect_size": 1.2954,
       "verdict": "SIGNIFICANT \u2713",
       "alpha": 0.05,
-      "notes": "Categories: en, id, nl, ca, af, et, sw, de, no, tl, ro, so, es, it, hr. N=258931"
+      "notes": "Categories: en, ca, nl. N=126"
     }
   ],
   "chart_paths": {

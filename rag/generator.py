@@ -28,7 +28,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Optional
 
-from retriever import RAGResponse
+from .retriever import RAGResponse
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 # Config
 # ─────────────────────────────────────────────────────────────
 
-LLAMA3_MODEL_ID = "meta-llama/Meta-Llama-3-8B-Instruct"
+LLAMA3_MODEL_ID = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
 @dataclass
 class GeneratorConfig:
@@ -136,16 +136,11 @@ def build_llama3_prompt(
         "Please provide a comprehensive, numbered answer with citations."
     )
 
-    # Llama-3 Instruct chat template
+    # TinyLlama Chat template
     prompt = (
-        "<|begin_of_text|>"
-        "<|start_header_id|>system<|end_header_id|>\n"
-        f"{system_prompt}\n"
-        "<|eot_id|>"
-        "<|start_header_id|>user<|end_header_id|>\n"
-        f"{user_message}\n"
-        "<|eot_id|>"
-        "<|start_header_id|>assistant<|end_header_id|>\n"
+        f"<|system|>\n{system_prompt}</s>\n"
+        f"<|user|>\n{user_message}</s>\n"
+        f"<|assistant|>\n"
     )
     return prompt
 
@@ -185,7 +180,7 @@ class RAGGenerator:
                 pipeline,
             )
 
-            logger.info(f"Loading Llama-3 model: {self.config.model_id}")
+            logger.info(f"Loading local LLM model: {self.config.model_id}")
 
             tokenizer = AutoTokenizer.from_pretrained(
                 self.config.model_id,
@@ -217,11 +212,11 @@ class RAGGenerator:
                 tokenizer=tokenizer,
             )
             self._tokenizer = tokenizer
-            logger.info("Llama-3 pipeline ready.")
+            logger.info("Local LLM pipeline ready.")
 
         except Exception as e:
             logger.warning(
-                f"Could not load Llama-3 ({e}). "
+                f"Could not load local LLM ({e}). "
                 "Running in stub mode — answers will be template strings (for testing)."
             )
             self._pipeline   = None
@@ -297,7 +292,7 @@ class RAGGenerator:
         return (
             f"1. Based on the retrieved context {source_refs}, here is what I found:\n\n"
             f"   {snippet}\n\n"
-            "2. This is a stub response — Llama-3 model is not loaded in this environment.\n"
-            "   To get real answers, download the model weights and set load_in_4bit=True.\n\n"
+            "2. This is a stub response — The local LLM model is not loaded in this environment.\n"
+            "   To get real answers, ensure transformers is installed and weights can be downloaded.\n\n"
             "3. Retrieved sources are listed below with their relevance scores."
         )

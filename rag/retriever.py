@@ -23,9 +23,9 @@ from typing import Optional
 
 import numpy as np
 
-from embeddings import EmbeddingEngine, EmbeddingConfig
-from vector_store import VectorStore, SearchResult, build_vector_store
-from reranker import CrossEncoderReranker, RankedResult
+from .embeddings import EmbeddingEngine, EmbeddingConfig
+from .vector_store import VectorStore, SearchResult, build_vector_store
+from .reranker import CrossEncoderReranker, RankedResult
 
 logger = logging.getLogger(__name__)
 
@@ -320,7 +320,7 @@ class RAGRetriever:
             )
         else:
             # No reranker — wrap SearchResult as RankedResult
-            from reranker import RankedResult as RR
+            from .reranker import RankedResult as RR
             ranked = [
                 RR(
                     chunk_id=r.chunk_id, text=r.text,
