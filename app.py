@@ -150,18 +150,7 @@ if test_results:
     df_tests = pd.DataFrame(test_results)
     st.dataframe(df_tests, use_container_width=True)
 
-chart_paths = analysis_report.get("chart_paths", {})
-if chart_paths:
-    st.markdown("**NLP Pipeline Data Distributions**")
-    cols = st.columns(2)
-    col_idx = 0
-    for fig_id, path_str in chart_paths.items():
-        img_path = Path(path_str)
-        if img_path.exists():
-            with cols[col_idx % 2]:
-                image = Image.open(img_path)
-                st.image(image, caption=fig_id, use_container_width=True)
-            col_idx += 1
+
 
 # ── Business Analysis Charts ──────────────────────────────────────────────────
 st.markdown("---")
@@ -195,92 +184,91 @@ st.markdown("---")
 st.subheader("🧠 AI Statistical Assistant")
 st.markdown("Let the AI analyze your dataset properties and recommend the best statistical tests.")
     
-    # Attempt to load RAG components globally for UI use
-    rag_available = False
-    ret = None
-    gen = None
-    try:
-         from rag.rag_pipeline import load_retriever
-         from rag.generator import RAGGenerator, GeneratorConfig
-         from collections import namedtuple
-         
-         index_path = Path(__file__).parent / "rag_index"
-         if index_path.exists():
-              Args = namedtuple('Args', ['index', 'backend', 'no_reranker', 'no_mmr', 'top_k'])
-              args = Args(index=str(index_path), backend="chroma", no_reranker=True, no_mmr=True, top_k=3)
-              ret = load_retriever(args)
-              gen = RAGGenerator(GeneratorConfig(max_new_tokens=256))
-              rag_available = True
-    except Exception as e:
-         st.warning(f"AI Assistant initialization failed: {e}")
-
-    if rag_available:
-         with st.expander("Show AI Recommendations", expanded=True):
-              if "ai_rec" not in st.session_state:
-                   with st.spinner("AI is analyzing dataset properties..."):
-                        rec_prompt = f"Analyze these dataset statistics: {json.dumps(pipeline_stats.get('language_distribution', {}))} and total chunks: {pipeline_stats.get('chunks_after_filter', 0)}. Recommend which of these tests should be run: Chi-Square, T-Test, or ANOVA. Explain briefly why. Limit to 3 sentences."
-                        # Send directly to generator since we have the data
-                        from rag.generator import RAGGenerator, GeneratorConfig
-                        from rag.retriever import RAGResponse
-                        dummy_resp = RAGResponse(query=rec_prompt, context=rec_prompt, passages=[], sources=[])
-                        ans = gen.generate(dummy_resp)
-                        st.session_state.ai_rec = ans.answer
-              
-              st.info(st.session_state.ai_rec)
-              
-         st.markdown("**Select Tests to run and include in the Full PDF Report:**")
-         col1, col2, col3 = st.columns(3)
-         with col1:
-              run_chi = st.checkbox("Chi-Square (Distribution check)", value=True)
-         with col2:
-              run_ttest = st.checkbox("T-Test (Compare 2 models)", value=False)
-         with col3:
-              run_anova = st.checkbox("ANOVA (Compare all variants)", value=False)
-    else:
-         run_chi, run_ttest, run_anova = False, False, False
-
-    st.markdown("---")
-    st.subheader("Export Analysis Report")
+# Attempt to load RAG components globally for UI use
+rag_available = False
+ret = None
+gen = None
+try:
+    from rag.rag_pipeline import load_retriever
+    from rag.generator import RAGGenerator, GeneratorConfig
+    from collections import namedtuple
     
+    index_path = Path(__file__).parent / "rag_index"
+    if index_path.exists():
+        Args = namedtuple('Args', ['index', 'backend', 'no_reranker', 'no_mmr', 'top_k'])
+        args = Args(index=str(index_path), backend="chroma", no_reranker=True, no_mmr=True, top_k=3)
+        ret = load_retriever(args)
+        gen = RAGGenerator(GeneratorConfig(max_new_tokens=256))
+        rag_available = True
+except Exception as e:
+    st.warning(f"AI Assistant initialization failed: {e}")
+
+if rag_available:
+    with st.expander("Show AI Recommendations", expanded=True):
+        if "ai_rec" not in st.session_state:
+            with st.spinner("AI is analyzing dataset properties..."):
+                rec_prompt = f"Analyze these dataset statistics: {json.dumps(pipeline_stats.get('language_distribution', {}))} and total chunks: {pipeline_stats.get('chunks_after_filter', 0)}. Recommend which of these tests should be run: Chi-Square, T-Test, or ANOVA. Explain briefly why. Limit to 3 sentences."
+                from rag.retriever import RAGResponse
+                dummy_resp = RAGResponse(query=rec_prompt, context=rec_prompt, passages=[], sources=[])
+                ans = gen.generate(dummy_resp)
+                st.session_state.ai_rec = ans.answer
+        
+        st.info(st.session_state.ai_rec)
+        
+    st.markdown("**Select Tests to run and include in the Full PDF Report:**")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        run_chi = st.checkbox("Chi-Square (Distribution check)", value=True)
+    with col2:
+        run_ttest = st.checkbox("T-Test (Compare 2 models)", value=False)
+    with col3:
+        run_anova = st.checkbox("ANOVA (Compare all variants)", value=False)
+else:
+    run_chi, run_ttest, run_anova = False, False, False
+
+st.markdown("---")
+st.subheader("Export Analysis Report")
+
+if st.button("📄 Generate & Download PDF Report", type="primary"):
     with st.spinner("Generating PDF (Including AI Executive Summary)..."):
         try:
             # Generate RAG Summary if pipeline is loaded
             ai_summary = None
             ai_stat_summary = None
             try:
-                 from rag.rag_pipeline import load_retriever
-                 from rag.generator import RAGGenerator, GeneratorConfig
-                 from collections import namedtuple
-                 
-                 index_path = Path(__file__).parent / "rag_index"
-                 if index_path.exists():
-                      Args = namedtuple('Args', ['index', 'backend', 'no_reranker', 'no_mmr', 'top_k'])
-                      args = Args(index=str(index_path), backend="chroma", no_reranker=True, no_mmr=True, top_k=3)
-                      ret = load_retriever(args)
-                      gen = RAGGenerator(GeneratorConfig(max_new_tokens=256))
-                      
-                      rag_req = ret.retrieve("Provide a comprehensive, high-level executive summary of exactly what dataset topics and domain focus areas are covered inside these documents. Limit your response to 2 detailed paragraphs.")
-                      ans = gen.generate(rag_req)
-                      ai_summary = ans.answer
-                      
-                      # Generate AI Analysis for selected tests
-                      selected_tests = []
-                      for t in test_results:
-                           name = t.get("test", "")
-                           if "Chi-Square" in name and run_chi: selected_tests.append(t)
-                           elif "t-test" in name and run_ttest: selected_tests.append(t)
-                           elif "ANOVA" in name and run_anova: selected_tests.append(t)
-                      
-                      if selected_tests:
-                           test_summary_prompt = f"Analyze these statistical test results and explain them in plain English. Are they significant? What does it mean for the dataset? Results: {json.dumps(selected_tests)}. Limit to 2 paragraphs."
-                           from rag.generator import RAGGenerator, GeneratorConfig
-                           from rag.retriever import RAGResponse
-                           dummy_resp2 = RAGResponse(query=test_summary_prompt, context=test_summary_prompt, passages=[], sources=[])
-                           ai_stat_ans = gen.generate(dummy_resp2)
-                           ai_stat_summary = ai_stat_ans.answer
-                           
+                from rag.rag_pipeline import load_retriever
+                from rag.generator import RAGGenerator, GeneratorConfig
+                from collections import namedtuple
+
+                index_path = Path(__file__).parent / "rag_index"
+                if index_path.exists():
+                    Args = namedtuple('Args', ['index', 'backend', 'no_reranker', 'no_mmr', 'top_k'])
+                    args = Args(index=str(index_path), backend="chroma", no_reranker=True, no_mmr=True, top_k=3)
+                    ret = load_retriever(args)
+                    gen = RAGGenerator(GeneratorConfig(max_new_tokens=256))
+
+                    rag_req = ret.retrieve("Provide a comprehensive, high-level executive summary of exactly what dataset topics and domain focus areas are covered inside these documents. Limit your response to 2 detailed paragraphs.")
+                    ans = gen.generate(rag_req)
+                    ai_summary = ans.answer
+
+                    # Generate AI Analysis for selected tests
+                    selected_tests = []
+                    for t in test_results:
+                        name = t.get("test", "")
+                        if "Chi-Square" in name and run_chi: selected_tests.append(t)
+                        elif "t-test" in name and run_ttest: selected_tests.append(t)
+                        elif "ANOVA" in name and run_anova: selected_tests.append(t)
+
+                    if selected_tests:
+                        test_summary_prompt = f"Analyze these statistical test results and explain them in plain English. Are they significant? What does it mean for the dataset? Results: {json.dumps(selected_tests)}. Limit to 2 paragraphs."
+                        from rag.generator import RAGGenerator, GeneratorConfig
+                        from rag.retriever import RAGResponse
+                        dummy_resp2 = RAGResponse(query=test_summary_prompt, context=test_summary_prompt, passages=[], sources=[])
+                        ai_stat_ans = gen.generate(dummy_resp2)
+                        ai_stat_summary = ai_stat_ans.answer
+
             except Exception as e:
-                 print(f"Skipping AI Summary in PDF due to: {e}")
+                print(f"Skipping AI Summary in PDF due to: {e}")
 
             pdf_bytes = generate_pdf_report(pipeline_stats, analysis_report, rag_summary_text=ai_summary, ai_stat_text=ai_stat_summary)
             st.download_button(
