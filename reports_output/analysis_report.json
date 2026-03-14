@@ -1,0 +1,55 @@
+{
+  "chunk_stats": {
+    "total_chunks": 126,
+    "mean_token_count": 59.92,
+    "median_token_count": 60.0,
+    "std_token_count": 0.89,
+    "mean_quality_score": 0.8089,
+    "language_distribution": {
+      "en": 118,
+      "ca": 4,
+      "nl": 3,
+      "af": 1
+    },
+    "domain_distribution": {
+      "finance": 1
+    },
+    "file_type_distribution": {
+      "csv": 126
+    }
+  },
+  "test_results": [
+    {
+      "test": "Chi-Square Goodness-of-Fit",
+      "statistic": 316.857143,
+      "p_value": 0.0,
+      "degrees_of_freedom": 3,
+      "effect_size": 1.5846,
+      "verdict": "SIGNIFICANT \u2713",
+      "alpha": 0.05,
+      "notes": "Categories: en, ca, nl, af. N=126"
+    }
+  ],
+  "chart_paths": {
+    "fig_1_1": "reports_output\\figures\\fig_1_1_token_distribution.png",
+    "fig_1_2": "reports_output\\figures\\fig_1_2_language_distribution.png",
+    "fig_1_3": "reports_output\\figures\\fig_1_3_quality_scores.png",
+    "fig_2_2": "reports_output\\figures\\fig_2_2_pvalue_summary.png",
+    "fig_3_1": "reports_output\\figures\\fig_3_1_metric_comparison.png",
+    "fig_3_3": "reports_output\\figures\\fig_3_3_domain_distribution.png"
+  },
+  "metric_table": {
+    "Base Llama-3 8B": {
+      "BLEU": 0.21,
+      "ROUGE-L": 0.34,
+      "BERTScore": 0.78,
+      "Perplexity": 18.4
+    },
+    "Fine-tuned (LoRA)": {
+      "BLEU": 0.38,
+      "ROUGE-L": 0.51,
+      "BERTScore": 0.86,
+      "Perplexity": 11.2
+    }
+  }
+}
