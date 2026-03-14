@@ -1,16 +1,27 @@
 {
   "total_files": 1,
-  "total_raw_chars": 14797,
-  "chunks_before_filter": 126,
-  "chunks_after_filter": 126,
+  "total_raw_chars": 32037527,
+  "chunks_before_filter": 258932,
+  "chunks_after_filter": 258931,
   "filter_rate_pct": 0.0,
-  "dropped_too_short": 0,
+  "dropped_too_short": 1,
   "dropped_low_quality": 0,
   "dropped_duplicates": 0,
   "language_distribution": {
-    "en": 118,
-    "ca": 4,
-    "nl": 3,
-    "af": 1
+    "en": 218400,
+    "id": 36345,
+    "nl": 2268,
+    "ca": 890,
+    "af": 553,
+    "et": 103,
+    "sw": 95,
+    "de": 154,
+    "no": 15,
+    "tl": 60,
+    "ro": 6,
+    "so": 10,
+    "es": 5,
+    "it": 26,
+    "hr": 1
   }
 }
