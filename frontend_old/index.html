@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stratify - Data Intelligence</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --primary-color: #10b981;
+            --secondary-color: #ffffff;
+            --accent-color: #34d399;
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 6%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            letter-spacing: -0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .login-btn {
+            background: rgba(16, 185, 129, 0.05);
+            color: var(--primary-color);
+            padding: 0.6rem 1.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 6% 1rem 6%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background glows */
+        .glow-1 {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(16, 185, 129, 0.1);
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .glow-2 {
+            position: absolute;
+            top: 40%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(52, 211, 153, 0.1);
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .hero-text {
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 800px;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #0f172a, #334155);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p {
+            color: #475569;
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Dropbox */
+        .dropbox-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .dropbox-container {
+            background: #ffffff;
+            border: 2px dashed rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .dropbox-container:hover, .dropbox-container.dragover {
+            border-color: #10b981;
+            background: #f0fdf4;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .dropbox-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .dropbox-container:hover .dropbox-icon {
+            transform: scale(1.1);
+        }
+
+        .dropbox-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .dropbox-subtext {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Features Section */
+        .features-section {
+            width: 100%;
+            max-width: 1200px;
+            padding-top: 4rem;
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .feature-card.animate {
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.03) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            background: #ffffff;
+            border-color: rgba(16, 185, 129, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Stagger the animations based on order */
+        .feature-card:nth-child(1).animate { animation-delay: 0.1s; }
+        .feature-card:nth-child(2).animate { animation-delay: 0.2s; }
+        .feature-card:nth-child(3).animate { animation-delay: 0.3s; }
+        .feature-card:nth-child(4).animate { animation-delay: 0.4s; }
+        .feature-card:nth-child(5).animate { animation-delay: 0.5s; }
+        .feature-card:nth-child(6).animate { animation-delay: 0.6s; }
+
+        .feature-icon-wrapper {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .bg-blue { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .bg-purple { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.2); }
+        .bg-green { background: rgba(5, 150, 105, 0.1); border: 1px solid rgba(5, 150, 105, 0.2); }
+        .bg-orange { background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.2); color: #eab308; }
+        .bg-teal { background: rgba(20, 184, 166, 0.1); border: 1px solid rgba(20, 184, 166, 0.2); color: #14b8a6; }
+        .bg-indigo { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: #6366f1; }
+
+        .feature-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .feature-desc {
+            color: #475569;
+            line-height: 1.5;
+            font-size: 0.85rem;
+        }
+
+        /* JSON Output parsing display */
+        #json-output {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #059669;
+            text-align: left;
+            display: none;
+            overflow-x: auto;
+        }
+
+        /* Login Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-overlay.active .login-card {
+            transform: translateY(0);
+        }
+
+        .login-card h2 {
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            color: #0f172a;
+        }
+
+        .login-card p {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .auth-btn {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .auth-btn:hover {
+            background: #059669;
+        }
+
+        .close-modal {
+            color: #64748b;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .close-modal:hover {
+            color: #0f172a;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field::placeholder {
+            color: #94a3b8;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-color);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .toggle-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-link {
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .toggle-link:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo" style="text-decoration:none;">Stratify</a>
+        <nav>
+            <ul>
+                <li><a href="index.html" style="color: var(--primary-color);">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="#" id="profile-nav-btn" class="login-btn">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+
+        <div class="hero-text">
+            <h1>Data Intelligence, Simplified.</h1>
+            <p>Upload your JSON or CSV data, extract insights from the web, and run powerful trained analysis models in seconds.</p>
+        </div>
+
+        <!-- Dropbox Area -->
+        <div class="dropbox-wrapper">
+            <div class="dropbox-container" id="dropbox">
+                <div class="dropbox-icon">📁</div>
+                <div class="dropbox-text">Drop your files here</div>
+                <div class="dropbox-subtext">Supports JSON, CSV, and TXT (Max 50MB)</div>
+                <input type="file" id="file-input" multiple accept=".json,.csv,.txt">
+                <div id="json-output"></div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="features-section" id="features">
+            <h2 class="features-title">Core Capabilities</h2>
+            <div class="features-grid">
+                
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <h3 class="feature-title">Web Scraping</h3>
+                    <p class="feature-desc">Automatically extract, parse, and structure data from any website. Turn unstructured web content into actionable JSON datasets instantly without writing code.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <h3 class="feature-title">Data Analysis</h3>
+                    <p class="feature-desc">Perform complex statistical analysis, generate rich visualizations, and uncover hidden trends within your uploaded datasets with ease.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <h3 class="feature-title">Trained Analysis</h3>
+                    <p class="feature-desc">Leverage custom AI models to classify, predict, and gain deep insights from your data using our advanced state-of-the-art machine learning pipeline.</p>
+                </div>
+
+                <!-- Feature 4 (New) -->
+                <div class="feature-card">
+                    <h3 class="feature-title">Cross-Platform</h3>
+                    <p class="feature-desc">Access your data intelligence dashboard seamlessly across desktop, tablet, and mobile devices with zero loss of functionality.</p>
+                </div>
+
+                <!-- Feature 5 (New) -->
+                <div class="feature-card">
+                    <h3 class="feature-title">Actionable Insights</h3>
+                    <p class="feature-desc">Convert raw data directly into clear, actionable business strategies with our automated insight generation engine.</p>
+                </div>
+
+                <!-- Feature 6 (New) -->
+                <div class="feature-card">
+                    <h3 class="feature-title">Real-Time Processing</h3>
+                    <p class="feature-desc">Experience lightning-fast processing for huge datasets, ensuring you have the data you need exactly when you need it.</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="width: 100%; border-top: 1px solid rgba(0,0,0,0.1); padding: 2rem 6%; text-align: center; color: #64748b; font-size: 0.9rem;">
+        &copy; 2026 Stratify Inc. All rights reserved.
+    </footer>
+
+    <!-- Login/Signup Modal -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="login-card" id="auth-card">
+            <h2 id="auth-title">Welcome Back</h2>
+            <p id="auth-subtitle">Please login to your profile to continue.</p>
+            <div id="auth-error-msg" style="color: #ef4444; font-size: 0.9rem; margin-bottom: 1rem; display: none;"></div>
+            
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email ID" class="input-field" required>
+                <input type="password" id="login-password" placeholder="Password" class="input-field" required>
+                <button type="submit" class="auth-btn">Login</button>
+                <p class="toggle-text">Don't have an account? <span class="toggle-link" id="go-to-signup">Sign up</span></p>
+            </form>
+
+            <form id="signup-form" style="display: none;">
+                <input type="text" id="signup-name" placeholder="Full Name" class="input-field" required>
+                <input type="email" id="signup-email" placeholder="Email Address" class="input-field" required>
+                <input type="text" id="signup-contact" placeholder="Phone / Alt Contact" class="input-field">
+                <input type="text" id="signup-company" placeholder="Company Name" class="input-field" required>
+                <input type="text" id="signup-niche" placeholder="Niche / Industry" class="input-field" required>
+                <input type="password" id="signup-password" placeholder="Password" class="input-field" required>
+                <button type="submit" class="auth-btn">Create Account</button>
+                <p class="toggle-text">Already have an account? <span class="toggle-link" id="go-to-login">Login</span></p>
+            </form>
+            
+            <button type="button" class="close-modal" id="close-modal-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // --- INLINED DATABASE LOGIC (Bypassing local file load issues) ---
+        const SUPABASE_URL = 'https://desgrqixwjkbplgjenyk.supabase.co'; 
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_lmH8vSiBwWMe6yrZ2Xo1lQ_49cm8sU2';
+
+        let supabase_client;
+        try {
+            if (window.supabase) {
+                supabase_client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+            }
+        } catch (e) {
+            console.error("Failed to initialize Supabase:", e);
+        }
+
+        async function saveUserToDatabase(fullName, companyName, niche, contact, email, password) {
+            if (!supabase_client) return { success: false, message: "Supabase client not loaded from CDN. Check Ad-blocker or Internet connection." };
+            try {
+                const { data: authData, error: authError } = await supabase_client.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: { data: { full_name: fullName, company_name: companyName, niche: niche } }
+                });
+                
+                if (authError) return { success: false, message: authError.message };
+
+                if (authData.user) {
+                    const { error: dbError } = await supabase_client.from('user_profiles').insert([{ 
+                        id: authData.user.id, 
+                        full_name: fullName, 
+                        email: email, 
+                        company_name: companyName, 
+                        niche_industry: niche, 
+                        contact_details: contact
+                    }]);
+                    if (dbError) console.warn("Profile table insert failed:", dbError.message);
+                }
+                return { success: true, data: authData };
+            } catch (error) {
+                return { success: false, message: error.message };
+            }
+        }
+
+        async function authenticateUser(email, password) {
+            if (!supabase_client) return { success: false, message: "Supabase client not loaded." };
+            try {
+                const { data, error } = await supabase_client.auth.signInWithPassword({ email: email, password: password });
+                if (error) return { success: false, message: error.message };
+                return { success: true, data: data };
+            } catch (error) {
+                return { success: false, message: error.message };
+            }
+        }
+
+        async function logoutUser() {
+            if (!supabase_client) return { success: false };
+            const { error } = await supabase_client.auth.signOut();
+            return { success: !error, message: error?.message };
+        }
+
+        async function checkActiveSession() {
+            if (!supabase_client) return null;
+            try {
+                const { data: { session } } = await supabase_client.auth.getSession();
+                return session;
+            } catch(e) {
+                return null;
+            }
+        }
+    </script>
+    <script>
+        // Dropbox Interactions
+        const dropbox = document.getElementById('dropbox');
+        const fileInput = document.getElementById('file-input');
+        const jsonOutput = document.getElementById('json-output');
+        const loginModal = document.getElementById('login-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const profileNavBtn = document.getElementById('profile-nav-btn');
+        
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const authTitle = document.getElementById('auth-title');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const goToSignup = document.getElementById('go-to-signup');
+        const goToLogin = document.getElementById('go-to-login');
+
+        const authErrorMsg = document.getElementById('auth-error-msg');
+
+        let isLoggedIn = false;
+
+        function showModal() {
+            loginModal.classList.add('active');
+            authErrorMsg.style.display = 'none';
+        }
+
+        function closeModal() {
+            loginModal.classList.remove('active');
+            authErrorMsg.style.display = 'none';
+        }
+
+        function showError(msg) {
+            authErrorMsg.textContent = msg;
+            authErrorMsg.style.display = 'block';
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+
+        profileNavBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (isLoggedIn) {
+                const response = await logoutUser();
+                if (response.success) {
+                    isLoggedIn = false;
+                    profileNavBtn.textContent = 'Profile';
+                    alert('Logged out successfully.');
+                } else {
+                    alert('Logout failed: ' + response.message);
+                }
+            } else {
+                showModal();
+            }
+        });
+
+        goToSignup.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+            authTitle.textContent = 'Create Profile';
+            authSubtitle.textContent = 'Sign up to unleash data intelligence.';
+            authErrorMsg.style.display = 'none';
+        });
+
+        goToLogin.addEventListener('click', () => {
+            signupForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            authTitle.textContent = 'Welcome Back';
+            authSubtitle.textContent = 'Please login to your profile to continue.';
+            authErrorMsg.style.display = 'none';
+        });
+
+        // Handle Database Authentication
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = loginForm.querySelector('button');
+            const originalText = btn.textContent;
+            
+            try {
+                btn.textContent = 'Logging in...';
+                btn.disabled = true;
+
+                if (typeof authenticateUser === 'undefined') {
+                    throw new Error("Unable to connect to database script (db.js crashed). Check console.");
+                }
+
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                const response = await authenticateUser(email, password);
+
+                btn.textContent = originalText;
+                btn.disabled = false;
+
+                if (!response.success) {
+                    showError(response.message);
+                } else {
+                    isLoggedIn = true;
+                    closeModal();
+                    loginForm.reset();
+                    alert('Successfully Logged In! You can now use the dropzone.');
+                    profileNavBtn.textContent = 'Logout';
+                }
+            } catch (err) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                showError("App Error: " + err.message);
+                console.error(err);
+            }
+        });
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = signupForm.querySelector('button');
+            const originalText = btn.textContent;
+            
+            try {
+                btn.textContent = 'Creating Account...';
+                btn.disabled = true;
+
+                if (typeof saveUserToDatabase === 'undefined') {
+                    throw new Error("Unable to connect to database script (db.js crashed). Check console.");
+                }
+
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const contact = document.getElementById('signup-contact').value;
+                const company = document.getElementById('signup-company').value;
+                const niche = document.getElementById('signup-niche').value;
+
+                const response = await saveUserToDatabase(name, company, niche, contact, email, password);
+
+                btn.textContent = originalText;
+                btn.disabled = false;
+
+                if (!response.success) {
+                    showError(response.message);
+                } else {
+                    isLoggedIn = true;
+                    closeModal();
+                    signupForm.reset();
+                    alert('Account Created Successfully!');
+                    profileNavBtn.textContent = 'Logout';
+                }
+            } catch (err) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                showError("App Error: " + err.message);
+                console.error(err);
+            }
+        });
+
+        // Check active session on load
+        window.addEventListener('load', async () => {
+            const session = await checkActiveSession();
+            if (session) {
+                isLoggedIn = true;
+                profileNavBtn.textContent = 'Logout';
+            }
+        });
+
+        dropbox.addEventListener('click', (e) => {
+            if(e.target !== jsonOutput) {
+                if(!isLoggedIn) {
+                    showModal();
+                } else {
+                    fileInput.click();
+                }
+            }
+        });
+
+        dropbox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropbox.classList.add('dragover');
+        });
+
+        dropbox.addEventListener('dragleave', () => {
+            dropbox.classList.remove('dragover');
+        });
+
+        dropbox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropbox.classList.remove('dragover');
+
+            if(!isLoggedIn) {
+                showModal();
+                return;
+            }
+            
+            if (e.dataTransfer.files.length) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFiles(e.target.files);
+            }
+        });
+
+        function handleFiles(files) {
+            const fileList = Array.from(files).map(f => ({
+                name: f.name,
+                size: (f.size / 1024).toFixed(2) + ' KB',
+                type: f.type || 'unknown'
+            }));
+
+            // Generate a JSON representation of uploaded files
+            const jsonStr = JSON.stringify({
+                status: "success",
+                message: "Files processed successfully",
+                files: fileList
+            }, null, 2);
+
+            jsonOutput.style.display = 'block';
+            jsonOutput.textContent = jsonStr;
+        }
+
+        // Feature Card Scroll Animation Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const featureObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.classList.add('animate');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.feature-card').forEach(card => {
+                featureObserver.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

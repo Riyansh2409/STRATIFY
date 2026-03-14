@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stratify - About Us</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --primary-color: #10b981;
+            --secondary-color: #ffffff;
+            --accent-color: #34d399;
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 6%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            letter-spacing: -0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .login-btn {
+            background: rgba(16, 185, 129, 0.05);
+            color: var(--primary-color);
+            padding: 0.6rem 1.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 4rem 6% 4rem 6%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background glows */
+        .glow-1 {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(16, 185, 129, 0.1);
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .glow-2 {
+            position: absolute;
+            top: 40%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(52, 211, 153, 0.1);
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* About Section */
+        .about-container {
+            max-width: 900px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 4rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .about-title {
+            font-size: 2.5rem;
+            color: #0f172a;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        .about-title span {
+            color: var(--primary-color);
+        }
+
+        .about-text {
+            color: #475569;
+            font-size: 1.15rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .about-highlight {
+            background: #ecfdf5;
+            color: #059669;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            font-weight: 500;
+            font-size: 1.05rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">Stratify</a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" style="color: var(--primary-color);">About</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="index.html" class="login-btn">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+
+        <div class="about-container">
+            <h1 class="about-title">Why we built <span>Stratify</span></h1>
+            <p class="about-text">
+                Stratify simplifies complex data interactions. Whether you're extracting data, analyzing massive datasets, or training custom intelligent models, our platform handles the heavy lifting so you can focus on actionable insights.
+            </p>
+            <p class="about-text">
+                We believe that access to powerful data intelligence shouldn't require an advanced degree in data science. By combining intuitive interfaces with state-of-the-art machine learning in the background, we're democratizing data analysis for businesses of all sizes.
+            </p>
+
+            <div class="about-highlight">
+                <b>Our Mission:</b> Transform your unstructured, chaotic data streams into clear, precise, and actionable intelligence today, ensuring you stay steps ahead of the curve.
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="width: 100%; border-top: 1px solid rgba(0,0,0,0.1); padding: 2rem 6%; text-align: center; color: #64748b; font-size: 0.9rem; margin-top: auto;">
+        &copy; 2026 Stratify Inc. All rights reserved.
+    </footer>
+
+</body>
+</html>
