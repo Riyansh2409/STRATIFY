@@ -196,12 +196,12 @@ try:
                 index=str(index_path), 
                 backend="chroma", 
                 no_reranker=True, 
-                no_mmr=False, 
+                no_mmr=True, 
                 top_k=3
             )
             
             retriever = load_retriever(args)
-            generator = RAGGenerator(GeneratorConfig(max_new_tokens=512))
+            generator = RAGGenerator(GeneratorConfig(max_new_tokens=256))
             return retriever, generator
 
         retriever, generator = load_rag_pipeline()

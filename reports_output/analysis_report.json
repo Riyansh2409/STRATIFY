@@ -6,9 +6,10 @@
     "std_token_count": 0.89,
     "mean_quality_score": 0.8089,
     "language_distribution": {
-      "en": 119,
+      "en": 118,
       "ca": 4,
-      "nl": 3
+      "nl": 3,
+      "af": 1
     },
     "domain_distribution": {
       "finance": 1
@@ -20,13 +21,13 @@
   "test_results": [
     {
       "test": "Chi-Square Goodness-of-Fit",
-      "statistic": 211.761905,
+      "statistic": 316.857143,
       "p_value": 0.0,
-      "degrees_of_freedom": 2,
-      "effect_size": 1.2954,
+      "degrees_of_freedom": 3,
+      "effect_size": 1.5846,
       "verdict": "SIGNIFICANT \u2713",
       "alpha": 0.05,
-      "notes": "Categories: en, ca, nl. N=126"
+      "notes": "Categories: en, ca, nl, af. N=126"
     }
   ],
   "chart_paths": {

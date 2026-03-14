@@ -8,8 +8,9 @@
   "dropped_low_quality": 0,
   "dropped_duplicates": 0,
   "language_distribution": {
-    "en": 119,
+    "en": 118,
     "ca": 4,
-    "nl": 3
+    "nl": 3,
+    "af": 1
   }
 }

@@ -45,7 +45,7 @@ class GeneratorConfig:
     temperature:       float = 0.2       # low = factual, high = creative
     top_p:             float = 0.9
     repetition_penalty: float = 1.1
-    load_in_4bit:      bool  = True       # QLoRA / bitsandbytes 4-bit
+    load_in_4bit:      bool  = False      # QLoRA / bitsandbytes 4-bit (disable on CPU)
     device_map:        str   = "auto"    # "auto" | "cpu" | "cuda:0"
 
     # Prompt tuning
@@ -189,9 +189,12 @@ class RAGGenerator:
             tokenizer.pad_token = tokenizer.eos_token
 
             model_kwargs: dict = {
-                "torch_dtype": torch.float16,
                 "device_map": self.config.device_map,
             }
+            if torch.cuda.is_available():
+                 model_kwargs["torch_dtype"] = torch.float16
+            else:
+                 model_kwargs["torch_dtype"] = torch.float32
             if self.config.load_in_4bit:
                 bnb_config = BitsAndBytesConfig(
                     load_in_4bit=True,
@@ -221,6 +224,7 @@ class RAGGenerator:
             )
             self._pipeline   = None
             self._tokenizer  = None
+            self._load_error = str(e)
 
     def generate(self, rag_response: RAGResponse) -> GeneratedAnswer:
         """
@@ -289,10 +293,11 @@ class RAGGenerator:
             f"[Context {s['index']}]" for s in rag.sources[:3]
         )
         snippet = rag.passages[0].snippet(120) if rag.passages else ""
+        error_msg = getattr(self, "_load_error", "Unknown error")
         return (
             f"1. Based on the retrieved context {source_refs}, here is what I found:\n\n"
             f"   {snippet}\n\n"
-            "2. This is a stub response — The local LLM model is not loaded in this environment.\n"
-            "   To get real answers, ensure transformers is installed and weights can be downloaded.\n\n"
+            f"2. This is a stub response — The local LLM model failed to load due to: {error_msg}\n"
+            "   To get real answers, ensure transformers is installed and you have enough memory.\n\n"
             "3. Retrieved sources are listed below with their relevance scores."
         )
