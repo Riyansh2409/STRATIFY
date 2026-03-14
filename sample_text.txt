@@ -1,5 +1,0 @@
-{"text": "Artificial Intelligence is transforming industries."}
-{"text": "Machine learning allows computers to learn patterns from data."}
-{"text": "Retrieval Augmented Generation combines retrieval with language models."}
-{"text": "Vector databases store embeddings for semantic search."}
-{"text": "This is a test document for the RAG pipeline."}
