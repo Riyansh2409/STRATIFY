@@ -1,0 +1,53 @@
+# ── Core ──────────────────────────────────────────────────────
+transformers>=4.40.0          # HuggingFace — Llama-3 tokenizer + model
+peft>=0.10.0                  # LoRA / QLoRA adapters
+bitsandbytes>=0.43.0          # 4-bit quantisation (QLoRA)
+datasets>=2.18.0              # HuggingFace datasets (load_dataset)
+accelerate>=0.28.0            # multi-GPU / mixed precision training
+
+# ── File ingestion ────────────────────────────────────────────
+pdfplumber>=0.11.0            # PDF text + table extraction
+pypdf2>=3.0.1                 # PDF fallback
+openpyxl>=3.1.2               # Excel read/write
+pandas>=2.2.0                 # DataFrame, CSV
+python-docx>=1.1.0            # DOCX parsing
+orjson>=3.10.0                # Fast JSON + JSONL
+chardet>=5.2.0                # Encoding detection
+
+# ── Text processing ───────────────────────────────────────────
+langdetect>=1.0.9             # Language detection
+tiktoken>=0.6.0               # Tokenizer fallback (no GPU needed)
+
+# ── Statistical analysis ──────────────────────────────────────
+scipy>=1.13.0                 # chi-square, t-test, ANOVA, KDE
+numpy>=1.26.0                 # Numerical ops
+statsmodels>=0.14.2           # Advanced stats (optional)
+scikit-learn>=1.4.0           # BLEU, F1, evaluation helpers
+
+# ── Deduplication ─────────────────────────────────────────────
+datasketch>=1.6.4             # MinHash LSH near-dedup
+
+# ── Charts ────────────────────────────────────────────────────
+matplotlib>=3.8.0             # Static charts (Figs 1.x–3.x)
+plotly>=5.20.0                # Interactive HTML charts (optional)
+
+# ── RAG (Layer 3B) ────────────────────────────────────────────
+langchain>=0.2.0              # RAG orchestration
+langchain-community>=0.2.0   # ChromaDB integration
+chromadb>=0.5.0               # Vector store
+sentence-transformers>=2.7.0  # Embeddings (all-MiniLM-L6-v2)
+faiss-cpu>=1.8.0              # FAISS index (CPU; use faiss-gpu on GPU)
+
+# ── API + serving ─────────────────────────────────────────────
+fastapi>=0.111.0              # REST API for inference
+uvicorn[standard]>=0.29.0    # ASGI server
+
+# ── Experiment tracking ───────────────────────────────────────
+mlflow>=2.12.0                # Model registry + run tracking
+wandb>=0.16.0                 # Weights & Biases (optional)
+
+# ── Dev / testing ─────────────────────────────────────────────
+pytest>=8.1.0
+pytest-cov>=5.0.0
+black>=24.4.0
+ruff>=0.4.0
