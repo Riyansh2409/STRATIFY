@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stratify - Pricing</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --primary-color: #10b981;
+            --secondary-color: #ffffff;
+            --accent-color: #34d399;
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 6%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-decoration: none;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            letter-spacing: -0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .login-btn {
+            background: rgba(16, 185, 129, 0.05);
+            color: var(--primary-color);
+            padding: 0.6rem 1.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 4rem 6% 4rem 6%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background glows */
+        .glow-1 {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(16, 185, 129, 0.1);
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .glow-2 {
+            position: absolute;
+            top: 40%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(52, 211, 153, 0.1);
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .pricing-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-banner {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            color: #065f46;
+            font-size: 0.95rem;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            justify-content: center;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .pricing-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            color: #0f172a;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            background: #ffffff;
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .pricing-card-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pricing-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-amount span {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .pricing-badge {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #10b981;
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .pricing-desc {
+            color: #475569;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            min-height: 65px;
+        }
+
+        .pricing-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .pricing-list-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .pricing-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .check-icon {
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo" style="text-decoration:none;">Stratify</a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="pricing.html" style="color: var(--primary-color);">Pricing</a></li>
+                <li><a href="index.html" class="login-btn">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+
+        <div class="pricing-section">
+            <div class="pricing-header">
+                <div class="pricing-logo">stratify</div>
+                <h2 class="pricing-title">Choose the Right Solution for You</h2>
+            </div>
+            
+            <div class="pricing-banner">
+                ✨ Introductory Offer: 38% off Stratify Pro Annual for new users (first year only). ✨
+            </div>
+
+            <div class="pricing-grid">
+                <!-- Pro Card -->
+                <div class="pricing-card">
+                    <div class="pricing-card-title">
+                        Pro
+                        <span class="pricing-badge">Save 38% on Annual First Year</span>
+                    </div>
+                    <div class="pricing-amount">$49<span>/mo</span></div>
+                    <p class="pricing-desc">Discover and prioritize opportunities with best-in-class private data intelligence</p>
+                    
+                    <div class="pricing-divider"></div>
+
+                    <div class="pricing-list-title">Pro Includes:</div>
+                    <ul class="pricing-list">
+                        <li><span class="check-icon">✓</span> Search 4M+ precise records with full results</li>
+                        <li><span class="check-icon">✓</span> Discover high potential patterns with real-time processed data</li>
+                        <li><span class="check-icon">✓</span> Export up to 2k rows per month to analyze search results</li>
+                        <li><span class="check-icon">✓</span> Track processing with saved searches and lists, alerts, and stages</li>
+                    </ul>
+                </div>
+
+                <!-- Business Card -->
+                <div class="pricing-card">
+                    <div class="pricing-card-title">Business</div>
+                    <div class="pricing-amount">$149<span>/mo</span></div>
+                    <p class="pricing-desc">Make strategic decisions with premium market insights, predictions and scalable workflows</p>
+                    
+                    <div class="pricing-divider"></div>
+
+                    <div class="pricing-list-title">Includes everything in Pro, plus:</div>
+                    <ul class="pricing-list">
+                        <li><span class="check-icon">✓</span> Export more data with 5K rows per month</li>
+                        <li><span class="check-icon">✓</span> Become an instant expert on industry trends with our AI agent</li>
+                        <li><span class="check-icon">✓</span> Future-proof your business with proprietary Predictions & Insights</li>
+                        <li><span class="check-icon">✓</span> Drive team efficiency with integrations, plus auto enrichment add-ons</li>
+                    </ul>
+                </div>
+
+                <!-- API Card -->
+                <div class="pricing-card">
+                    <div class="pricing-card-title">API</div>
+                    <div class="pricing-amount">$349<span>/mo</span></div>
+                    <p class="pricing-desc">Build applications or enrich your organization's data with the full power of predictive intelligence</p>
+                    
+                    <div class="pricing-divider"></div>
+
+                    <div class="pricing-list-title">With Stratify API, you can:</div>
+                    <ul class="pricing-list">
+                        <li><span class="check-icon">✓</span> Access live analyzed data at scale with 200 calls/min</li>
+                        <li><span class="check-icon">✓</span> Develop with the same data processing that powers Stratify</li>
+                        <li><span class="check-icon">✓</span> View the history and unpublished details on Predictions and Insights (all indicators, scoring, and sources)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="width: 100%; border-top: 1px solid rgba(0,0,0,0.1); padding: 2rem 6%; text-align: center; color: #64748b; font-size: 0.9rem; margin-top: auto;">
+        &copy; 2026 Stratify Inc. All rights reserved.
+    </footer>
+
+</body>
+</html>

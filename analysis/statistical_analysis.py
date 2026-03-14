@@ -327,17 +327,29 @@ class ChartGenerator:
         """Fig 1.3 — Quality score KDE + threshold line."""
         from scipy.stats import gaussian_kde
         scores = np.array(quality_scores)
-        xs = np.linspace(0, 1, 300)
-        kde = gaussian_kde(scores, bw_method=0.1)
-
+        
         fig, ax = plt.subplots(figsize=(8, 4))
-        ax.fill_between(xs, kde(xs), alpha=0.3, color=PALETTE[0])
-        ax.plot(xs, kde(xs), color=PALETTE[0], linewidth=2)
-        ax.axvline(QUALITY_THRESHOLD := 0.70, color=PALETTE[3], linestyle="--",
-                   linewidth=1.5, label=f"Threshold: {0.70}")
+        
+        # If we have multiple points, attempt KDE
+        if len(scores) > 1:
+            try:
+                xs = np.linspace(0, 1, 300)
+                kde = gaussian_kde(scores, bw_method=0.1)
+                ax.fill_between(xs, kde(xs), alpha=0.3, color=PALETTE[0])
+                ax.plot(xs, kde(xs), color=PALETTE[0], linewidth=2)
+            except Exception as e:
+                logger.warning(f"KDE failed: {e}. Falling back to histogram.")
+                ax.hist(scores, bins=min(20, len(scores)), alpha=0.3, color=PALETTE[0], density=True)
+        else:
+            # Single data point: KDE is mathematically impossible, show a vertical line
+            ax.axvline(scores[0], color=PALETTE[0], linewidth=2, label="Score")
+            ax.set_ylim(0, 1)
+
+        ax.axvline(0.70, color=PALETTE[3], linestyle="--",
+                   linewidth=1.5, label="Threshold: 0.70")
         ax.set_xlabel("Quality score")
         ax.set_ylabel("Density")
-        ax.set_title("Fig 1.3 — Quality Score Distribution (KDE)", fontweight="bold", pad=12)
+        ax.set_title("Fig 1.3 — Quality Score Distribution", fontweight="bold", pad=12)
         ax.legend(frameon=False)
         return _save_fig(fig, self.output_dir, "fig_1_3_quality_scores")
 

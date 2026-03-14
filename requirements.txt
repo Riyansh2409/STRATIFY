@@ -41,6 +41,7 @@ faiss-cpu>=1.8.0              # FAISS index (CPU; use faiss-gpu on GPU)
 # ── API + serving ─────────────────────────────────────────────
 fastapi>=0.111.0              # REST API for inference
 uvicorn[standard]>=0.29.0    # ASGI server
+python-multipart>=0.0.9      # Required for FastAPI file uploads
 
 # ── Experiment tracking ───────────────────────────────────────
 mlflow>=2.12.0                # Model registry + run tracking
@@ -51,3 +52,4 @@ pytest>=8.1.0
 pytest-cov>=5.0.0
 black>=24.4.0
 ruff>=0.4.0
+fpdf2>=2.7.0                  # PDF report generation
