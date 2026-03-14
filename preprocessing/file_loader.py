@@ -28,7 +28,6 @@ from docx import Document
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class LoadedDocument:
     """Raw document after loading — before any preprocessing."""
